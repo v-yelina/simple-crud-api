@@ -10,12 +10,13 @@ const app = (req, res) => {
   };
 
   const requestUrl = url.parse(req.url, true);
-  const path = requestUrl.pathname.split("/").slice(1).join("/");
+  const path = requestUrl.pathname.split("/").filter((e) => e.length > 0);
+  const root = path.join("/");
 
   switch (req.method) {
     case "GET":
       {
-        switch (path) {
+        switch (root) {
           case "":
             {
               res.json(200, {
@@ -25,66 +26,60 @@ const app = (req, res) => {
             break;
 
           case "person":
-            // {
-            //   res.json(200, {
-            //     message: "It's a simple CRUD API from Task 3 of NodeJS course",
-            //   });
-            // }
             controller.getAllPersons(req, res);
             break;
 
-          // case `person/${path[1]}`:
-          //   getPerson(req, res, path[1]);
-          //   break;
+          case `person/${path[1]}`:
+            controller.getPerson(req, res, path[1]);
+            break;
           default: {
             res.json(404, { error: "Page Not Found" });
           }
         }
       }
       break;
-    // case "POST":
-    //   {
-    //     switch (root) {
-    //       case "books":
-    //         {
-    //           addBook(req, res);
-    //         }
-    //         break;
-    //       default: {
-    //         res.json(501, "Internal Server Error");
-    //       }
-    //     }
-    //   }
-    //   break;
-    // case "PATCH":
-    //   {
-    //     switch (root) {
-    //       case `books/${path[1]}`:
-    //         {
-    //           updateBook(req, res, path[1]);
-    //         }
-    //         break;
-    //       default: {
-    //         res.json(501, "Internal Server Error");
-    //       }
-    //     }
-    //   }
-    //   break;
-    // case "DELETE":
-    //   {
-    //     switch (root) {
-    //       case `books/${path[1]}`:
-    //         {
-    //           deleteBook(req, res, path[1]);
-    //         }
-    //         break;
-    //       default: {
-    //         res.json(500, "Internal Server Error");
-    //       }
-    //     }
-    //   }
-
-    //   break;
+    case "POST":
+      {
+        switch (root) {
+          case "person":
+            {
+              controller.postPerson(req, res);
+            }
+            break;
+          default: {
+            res.json(501, "Internal Server Error");
+          }
+        }
+      }
+      break;
+    case "PUT":
+      {
+        switch (root) {
+          case `person/${path[1]}`:
+            {
+              controller.putPerson(req, res, path[1]);
+            }
+            break;
+          default: {
+            res.json(501, "Internal Server Error");
+          }
+        }
+      }
+      break;
+    case "DELETE":
+      {
+        switch (root) {
+          case `person/${path[1]}`:
+            {
+              controller.deletePerson(req, res, path[1]);
+            }
+            break;
+          default: {
+            res.json(500, "Internal Server Error");
+          }
+        }
+      }
+      break;
     default: {
       res.json(404, { error: "Error 404 not found" });
     }
