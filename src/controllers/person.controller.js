@@ -2,11 +2,9 @@ const fs = require("fs");
 const uuid = require("uuid");
 
 exports.getAllPersons = (req, res) => {
-  let persons;
   fs.readFile(`${__dirname}/db.json`, "utf8", function (err, data) {
     if (err) throw err;
     try {
-      //   console.log("all:" + data);
       res.end(data);
     } catch (err) {
       res.json(500, { error: "Internal Server Error" });
@@ -22,10 +20,7 @@ exports.getPerson = (req, res, personID) => {
     if (err) throw err;
     try {
       persons = JSON.parse(data);
-      //   console.log("1:" + typeof persons);
-      //   console.log("1:" + persons);
       person = persons.find((item) => item.id === personID);
-      //   console.log(person);
       res.end(JSON.stringify(person));
     } catch (err) {
       res.json(500, { error: "Internal Server Error" });
@@ -43,16 +38,13 @@ exports.postPerson = (req, res) => {
     const data = Buffer.concat(chunks).toString();
     newPerson = JSON.parse(data);
     newPerson.id = uuid.v4();
-    // console.log(newPerson);
     res.end();
   });
   let persons;
   fs.readFile(`${__dirname}/db.json`, "utf8", function (err, data) {
     if (err) throw err;
     try {
-      //   console.log(data);
       persons = JSON.parse(data);
-      //   console.log(persons);
       persons.push(newPerson);
       fs.writeFile(
         `${__dirname}/db.json`,
@@ -69,6 +61,67 @@ exports.postPerson = (req, res) => {
   });
 };
 
-// const putPerson = (req, res, personID) => {};
+exports.putPerson = (req, res, personID) => {
+  let newOptions;
+  const chunks = [];
+  req.on("data", (chunk) => chunks.push(chunk));
 
-// const deletePerson = (req, res, personID) => {};
+  req.on("end", () => {
+    const data = Buffer.concat(chunks).toString();
+    newOptions = JSON.parse(data);
+    console.log(newOptions);
+    let persons;
+    let newPersons = [];
+    fs.readFile(`${__dirname}/db.json`, "utf8", function (err, data) {
+      if (err) throw err;
+      try {
+        persons = JSON.parse(data);
+        persons.map((item) => {
+          if (item.id === personID) {
+            item = { id: personID, ...newOptions };
+          }
+          newPersons.push(item);
+        });
+        fs.writeFile(
+          `${__dirname}/db.json`,
+          JSON.stringify(newPersons),
+          function (err, data) {
+            if (err) throw err;
+          }
+        );
+        res.end();
+      } catch (err) {
+        res.json(500, { error: "Internal Server Error" });
+        console.log(err);
+      }
+    });
+    res.end();
+  });
+};
+
+exports.deletePerson = (req, res, personID) => {
+  let persons;
+  let newPersons = [];
+  fs.readFile(`${__dirname}/db.json`, "utf8", function (err, data) {
+    if (err) throw err;
+    try {
+      persons = JSON.parse(data);
+      persons.map((item) => {
+        if (item.id !== personID) {
+          newPersons.push(item);
+        }
+      });
+      fs.writeFile(
+        `${__dirname}/db.json`,
+        JSON.stringify(newPersons),
+        function (err, data) {
+          if (err) throw err;
+        }
+      );
+      res.end();
+    } catch (err) {
+      res.json(500, { error: "Internal Server Error" });
+      console.log(err);
+    }
+  });
+};
