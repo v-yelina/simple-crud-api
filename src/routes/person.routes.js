@@ -33,7 +33,7 @@ const app = (req, res) => {
             controller.getPerson(req, res, path[1]);
             break;
           default: {
-            res.json(404, { error: "Page Not Found" });
+            res.json(404, { error: "This page doesn't exist" });
           }
         }
       }
@@ -81,7 +81,7 @@ const app = (req, res) => {
       }
       break;
     default: {
-      res.json(404, { error: "Error 404 not found" });
+      res.json(404, { error: "This page doesn't exist" });
     }
   }
 };
