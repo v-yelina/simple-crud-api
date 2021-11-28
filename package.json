@@ -3,7 +3,7 @@
     "build": "webpack",
     "start:dev": "nodemon app.js",
     "start:prod": "npm run build && node dist/main.js",
-    "test": "mocha -r test/test.js --exit"
+    "test": "mocha"
   },
   "dependencies": {
     "dotenv": "^10.0.0",
