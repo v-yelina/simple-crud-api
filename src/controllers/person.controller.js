@@ -36,7 +36,7 @@ exports.getAllPersons = (req, res) => {
 // Get one person by id
 exports.getPerson = (req, res, personID) => {
   if (!checkUUID(personID)) {
-    res.json(400, { Error: "Person id is invalid" });
+    return res.json(400, { Error: "Person id is invalid" });
   }
 
   let persons;
@@ -47,7 +47,7 @@ exports.getPerson = (req, res, personID) => {
       persons = JSON.parse(data);
       person = persons.find((item) => item.id === personID);
       if (!person) {
-        res.json(404, { Error: "There isn't a person with such id" });
+        return res.json(404, { Error: "There isn't a person with such id" });
       }
       res.json(200, person);
     } catch (err) {
@@ -102,7 +102,7 @@ exports.postPerson = (req, res) => {
 // Put changes in a person
 exports.putPerson = (req, res, personID) => {
   if (!checkUUID(personID)) {
-    res.json(400, { Error: "Person id is invalid" });
+    return res.json(400, { Error: "Person id is invalid" });
   }
 
   // Get new options and create changed person object
@@ -123,21 +123,21 @@ exports.putPerson = (req, res, personID) => {
         persons = JSON.parse(data);
         const person = persons.find((item) => item.id === personID);
         if (!person) {
-          res.json(404, { Error: "There isn't a person with such id" });
+          return res.json(404, { Error: "There isn't a person with such id" });
         }
         persons.map((item) => {
           if (item.id === personID) {
             item = { id: personID, ...newOptions };
             updatedPerson = item;
-            if (!checkRequiredFields(updatedPerson)) {
-              res.json(400, {
-                Error:
-                  "Some fields are missed. Required fields: name, age, hobbies",
-              });
-            }
           }
           newPersons.push(item);
         });
+        if (!checkRequiredFields(updatedPerson)) {
+          return res.json(400, {
+            Error:
+              "Some fields are missed. Required fields: name, age, hobbies",
+          });
+        }
         fs.writeFile(
           `${__dirname}/db.json`,
           JSON.stringify(newPersons),
@@ -156,6 +156,7 @@ exports.putPerson = (req, res, personID) => {
   });
 };
 
+// Delete person with given ID
 exports.deletePerson = (req, res, personID) => {
   if (!checkUUID(personID)) {
     res.json(400, { Error: "Person id is invalid" });
